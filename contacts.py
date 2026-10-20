@@ -1,10 +1,7 @@
 from datetime import datetime
 
-# contacts = [
-#     ("Alice", "123-456-7890", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), ["Some City", "Some State", "Some Country"]),
-#     ("Bob", "987-654-3210", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), ["Another City", "Another State", "Another Country"]),
-#     ("Charlie", "555-555-5555", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), ["Yet Another City", "Yet Another State", "Yet Another Country"])
-# ]
+import pickle
+import sys
 
 def add_contact_old():
     name = input("Enter name: ").strip()
@@ -48,17 +45,7 @@ def edit_contact():
     except ValueError:
         print("❌ Invalid input. Please enter a valid number.")
         
-# def delete_contact(id_str):
-#     try:
-#         idx = int(id_str) - 1
-#         if idx < 0 or idx >= len(contacts):
-#             print("❌ Invalid ID.")
-#             return
-#         deleted_contact = contacts.pop(idx)
-#         print(f"🗑️ Contact '{deleted_contact[0]}' deleted successfully.")
-#     except ValueError:
-#         print("❌ Invalid input. Please enter a valid number.")
-      
+     
 def delete_contact(contact_id):
     """Delete a contact by ID"""
     if not contacts:
@@ -83,48 +70,8 @@ menu_items = [
     "Delete Contact",
     "Exit"
 ]  
-# choice = input(f"Enter your choice (1-{len(menu_items)}): ").strip()
-# match choice:
-#     case "1": add_contact()
-#     case "2": view_contacts()
-#     case "3":
-#         query = input("Enter term for search: ").strip()
-#         search_contact(query)
-#     case "4": edit_contact()
-#     case "5":
-#         view_contacts() # Show contacts before asking for ID
-#         id_str = input("Enter ID to delete: ").strip()
-#         delete_contact(id_str)
-#     case "6":
-#         print("👋 Thank you for using Phone Book CLI. Goodbye!")
-#     case _: print("❌ Invalid choice. Please try again.")
-
 keys = ["name", "phone", "email", "address", "notes", "added"]
 
-# contact.from_keys = lambda d: (d.get("name"), d.get("phone"), d.get("email"), d.get("address"), d.get("notes"), d.get("added"))
-contact = dict.fromkeys(keys, "")
-# {'name': "", 'phone': "", 'email': "", 'address': "", 'notes': "", 'added': ""}
-print("📞 Welcome to Phone Book CLI")
-print("Please choose an option:")
-for idx, item in enumerate(menu_items, start=1):
-    print(f"{idx}. {item}")
-    
-# print(contact)  # Print the contact dictionary to verify its structure
-
-print(hash(contact['name']))  # Print the hash of the contact's name
-
-i = 1  # Example index for demonstration
-contact['name'] = "John Doe"
-contact['phone'] = "123-456-7890"
-contact['email'] = "john.doe@example.com"
-contact['address'] = "123 Main St, Anytown, USA"
-contact['notes'] = "Friend from college" 
-added = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-print(f"{i:<2} {contact['name']:<8} {contact['phone']:<10} {contact['email']:<15} {contact['address']:<20} {contact['notes']:<20} {added}")  
-# Print formatted contact information
-
-contacts = []  # Initialize an empty list to store contacts
-values = ['Alice', '456730', 'test@my.com', 'My city', 'My note', datetime.now().isoformat() ]
 
 def save_contact(keys, values):
     """Add a new contact to memory and disk"""
@@ -136,7 +83,10 @@ def save_contact(keys, values):
     print(f"📇 Total contacts: {len(contacts)}")
     # print(f"📝 Contact details: {contacts[0]}")
 
-save_contact(keys, values)  # Call the function to save the contact
+def save_contacts(contacts):
+    # Write to the file
+    with open('db.pkl', 'wb') as f:
+        pickle.dump(contacts, f)
 
 def get_field(field):
     """Gets valid field from user with validation."""
@@ -151,18 +101,6 @@ def get_optional_field(field):
     """Gets optional field from user."""
     return input(f"Enter {field} (optional): ").strip() or None
 
-# name = get_field("name")
-# phone = get_field("phone")
-# address = get_optional_field("address")
-
-# def add_contact():
-#     name = input("Enter name: ").strip()
-#     phone = input("Enter phone number: ").strip()
-#     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-#     address = input("Enter address (City, State, Country): ").strip().split(", ")
-#     contacts.append((name, phone, timestamp, address))
-#     print(f"✅ Contact '{name}' added successfully.")
-
 def add_contact():
     """Handle adding a contact with validation"""
     print("\n➕ ADD NEW CONTACT")
@@ -172,8 +110,6 @@ def add_contact():
     address = get_optional_field('address') # input("Enter address (optional): ").strip() or None
     notes = get_optional_field('notes') # input("Enter notes (optional): ").strip() or None
     save_contact(keys, [name, phone, email, address, notes, datetime.now().isoformat()])
-    
-# add_contact()
 
 
 def data_table(contacts, title):
@@ -189,8 +125,13 @@ def data_table(contacts, title):
         added = contact.get('added', 'N/A')
         print(f"{i:<3} {contact['name']:<20} {contact['phone']:<15} {email:<20} {added[:10]}")
 
-# for idx, contact in enumerate(contacts, start=1):
-#     print(f"{idx:<2} {contact['name']:<8} {contact['phone']:<10} {contact['email']:<15} {contact['address'] or 'N/A':<20} {contact['notes'] or 'N/A':<20} {contact['added']}")  
+def load_contacts(db_name: str):
+    """Load contacts from file."""
+    try:
+        with open(db_name, "rb") as f:
+            return pickle.load(f)
+    except (FileNotFoundError, EOFError, pickle.UnpicklingError):
+        return {}
 
 def view_contacts():
     """Display all contacts"""
@@ -199,6 +140,15 @@ def view_contacts():
         return
     data_table(contacts, 'contact list')
     
+if (args_count := len(sys.argv)) > 2:
+    print(f"One argument expected, got {args_count - 1}")
+    raise SystemExit(2)
+elif args_count < 2:
+    print("You must specify the database name")
+    raise SystemExit(2)
+                     
+print('sys.argv : ', sys.argv)
+contacts = load_contacts('db.pkl')
 while True:
     print("\nPlease choose an option:")
     for idx, item in enumerate(menu_items, start=1):
@@ -206,8 +156,12 @@ while True:
     
     choice = input(f"Enter your choice (1-{len(menu_items)}): ").strip()
     match choice:
-        case "1": add_contact()
-        case "2": view_contacts()
+        case "1": 
+            add_contact()
+            save_contacts(contacts)            
+        case "2": 
+            load_contacts('db.pkl')
+            view_contacts()
         case "3":
             query = input("Enter term for search: ").strip()
             search_contact(query)
