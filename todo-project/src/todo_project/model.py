@@ -1,4 +1,7 @@
 
+from todo_project.priority import Priority
+
+
 class Task:
     """Represents a task in the todo application."""
 
@@ -7,6 +10,7 @@ class Task:
         self.title = title
         self.description = description
         self.completed = completed
+        self.priority = Priority.NORMAL
 
     def mark_completed(self) -> None:
         """Marks the task as completed."""

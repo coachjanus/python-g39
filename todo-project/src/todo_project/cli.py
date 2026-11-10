@@ -5,7 +5,9 @@ from .config import version, app_name
 from .model import Task
 from .tasks import TaskList
 
-def app() -> None:
+
+
+def cli() -> None:
     """Main entry point for the todo application."""
     print(f"Welcome to {app_name} version {version}!")
     task_list = TaskList()
