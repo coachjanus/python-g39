@@ -1,18 +1,32 @@
 '''Todo Project: Top level module for todo application'''
 
+from pathlib import Path
+
 import typer
 
+from todo_project import config
+
 from .ui import UI
+from .database import init_database
 
 
-from .cli import cli  # pyright: ignore[reportMissingImports]
+# from .cli import cli  # pyright: ignore[reportMissingImports]
 
 app = typer.Typer()
 
 @app.command()
-def init():
+def init(db_path: str = typer.Option(str(config.DEFAULT_DB_FILE_PATH), prompt="TODO database location?")):
     """Initialize the todo CLI application."""
-    print("Todo CLI Application Initialized")
+    
+    app_init_error = config.init_app(db_path)
+    if app_init_error:
+        typer.secho(f"Creating config file failed with {config.ERRORS[app_init_error]}", fg=typer.colors.RED)
+        raise typer.Exit(1)
+    db_init_error = init_database(Path(db_path))
+    if db_init_error:
+        typer.secho(f"Creating database failed with {config.ERRORS[db_init_error]}", fg=typer.colors.RED)
+        raise typer.Exit(1)
+    typer.secho(f"The todo database is {db_path}", fg=typer.colors.GREEN)
 
 @app.command()
 def start():
@@ -42,8 +56,9 @@ def start():
             case '5':
                 try:
                     task_id = int(input("Enter task ID to change priority: "))
-                    new_priority = input("Enter new priority (low, medium, high): ")
-                    ui.change_priority(task_id, new_priority)
+                    # new_priority = input("Enter new priority (low, medium, high): ")
+                    # ui.change_priority(task_id, new_priority)
+                    ui.new_priority(task_id)
                 except ValueError:
                     print("Invalid ID. Please enter a number.")
             case '6':
