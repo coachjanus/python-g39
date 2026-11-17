@@ -28,7 +28,7 @@ class UI:
         # Display all tasks in a table format
         table = Table(title="To-Do List")
         table.add_column("ID", justify="right", style="cyan", no_wrap=True)
-        table.add_column("Title", style="magenta")
+        # table.add_column("Title", style="magenta")
         table.add_column("Description", style="green")
         table.add_column("Completed", justify="center", style="red")
         table.add_column("Priority", justify="center", style="yellow")
@@ -36,7 +36,7 @@ class UI:
         # Assuming self.todo_list.get_tasks() returns a list of Task objects
         tasks = self.todo_list.get_tasks()
         for task in tasks:
-            table.add_row(str(task.id), task.title, task.description, str(task.completed), task.priority.name)
+            table.add_row(str(task.id), task.description, str(task.completed), task.priority.name)
 
         self.console.print(table)
         
@@ -98,10 +98,14 @@ class UI:
         return res
     
     def choose_priority(self):
-        return Prompt.ask("Coose priority: " + UI.join_priority(), default=Priority.NORMAL)
+        return Prompt.ask("Coose priority: " + UI.join_priority(), choices=[str(priority.value) for priority in Priority], default="0")
     
     def new_priority(self, task_id):
-        priority = self.choose_priority()
+        priority = Priority(self.choose_priority())
+        print(f"Changing priority of task {task_id} to {priority}")
+        # if not isinstance(priority, Priority):
+        #     self.console.print("Invalid priority. Please choose from the available options.", style="bold red")
+        #     return 
         if self.todo_list.set_priority(task_id, Priority(int(priority)).name):
             self.console.print("Task changed priority.", style="bold green")
         else:

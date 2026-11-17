@@ -31,9 +31,8 @@ class Task:
         
     def to_dict(self):
         return {
-    "id": self.id,
-    "description": self.description,
-    "completed": self.completed,
-    "priority": self.priority
-
-    }
+        "id": self.id,
+        "description": self.description,
+        "completed": self.completed,
+        "priority": self.priority,
+        }

@@ -56,6 +56,7 @@ def start():
             case '5':
                 try:
                     task_id = int(input("Enter task ID to change priority: "))
+                    print("task_id:", task_id)
                     # new_priority = input("Enter new priority (low, medium, high): ")
                     # ui.change_priority(task_id, new_priority)
                     ui.new_priority(task_id)
