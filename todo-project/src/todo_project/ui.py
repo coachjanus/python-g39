@@ -28,7 +28,7 @@ class UI:
         # Display all tasks in a table format
         table = Table(title="To-Do List")
         table.add_column("ID", justify="right", style="cyan", no_wrap=True)
-        # table.add_column("Title", style="magenta")
+
         table.add_column("Description", style="green")
         table.add_column("Completed", justify="center", style="red")
         table.add_column("Priority", justify="center", style="yellow")
@@ -36,7 +36,8 @@ class UI:
         # Assuming self.todo_list.get_tasks() returns a list of Task objects
         tasks = self.todo_list.get_tasks()
         for task in tasks:
-            table.add_row(str(task.id), task.description, str(task.completed), task.priority.name)
+
+            table.add_row(str(task.id), task.description, str(task.completed), Priority(task.priority).name)
 
         self.console.print(table)
         
@@ -54,10 +55,9 @@ class UI:
         
     def add(self, description):
         # Add a new task with the given description
-        # task_id = 1 if not self.todo_list.get_tasks() else max(t.id for t in self.todo_list.get_tasks()) + 1
-        # new_task = Task(id=task_id, title=description, description=description)
+        
         priority=self.choose_priority()
-        new_task = self.todo_list.add_task(description, priority)
+        new_task = self.todo_list.add_task(description, int(priority))
         print(f"Task added: {new_task}")
         
     def complete(self, task_id):
@@ -101,12 +101,9 @@ class UI:
         return Prompt.ask("Coose priority: " + UI.join_priority(), choices=[str(priority.value) for priority in Priority], default="0")
     
     def new_priority(self, task_id):
-        priority = Priority(self.choose_priority())
-        print(f"Changing priority of task {task_id} to {priority}")
-        # if not isinstance(priority, Priority):
-        #     self.console.print("Invalid priority. Please choose from the available options.", style="bold red")
-        #     return 
-        if self.todo_list.set_priority(task_id, Priority(int(priority)).name):
+        priority = Priority(int(self.choose_priority()))
+        
+        if self.todo_list.set_priority(task_id, int(priority)):
             self.console.print("Task changed priority.", style="bold green")
         else:
             self.console.print("Task not found.", style="bold red")

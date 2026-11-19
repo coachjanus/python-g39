@@ -1,8 +1,3 @@
-
-# import json
-# import os
-# from typing import List
-
 from .model import Task
 from pathlib import Path
 from .dbhandler import DBHandler
@@ -17,8 +12,7 @@ class TaskList:
         self._db_handler = DBHandler(db_path)
         response = self._db_handler.load_from_file()
         self._tasks: List[Task] = [task for task in response.data]
-        # print(self._tasks)
-        # self._tasks: Dict[int, Task] = {task.id: task for task in response.data}
+        
         self._next_id = 1 if not self._tasks else len(self._tasks) + 1
 
 
@@ -26,13 +20,10 @@ class TaskList:
         """Add a new task to the list."""
         task_id = self._next_id
         task = Task(task_id, description=description, priority=priority)
-        # self._tasks[task_id] = task
+
         self._tasks.append(task)
         self._next_id += 1
-        # print(self._tasks[task_id])
-        # self.tasks.append(task)
-        # self.save_to_file()
-        # return task
+
         response = self._db_handler.save_to_file(self._tasks)
         if response.error == SUCCESS:
             return TodoResponse(task, response.error)
@@ -53,22 +44,9 @@ class TaskList:
                 return True
         return False
 
-    def set_priority(self, task_id: int, priority: str):
-        for task in self.tasks:
+    def set_priority(self, task_id: int, priority: int):
+        for task in self._tasks:
             if task.id == task_id:
                 task.priority = priority
                 return True
         return False
-    
-    # def save_to_file(self):
-    #     with open(self.db_path, 'w') as f:
-    #         json.dump([task.to_dict() for task in self.tasks], f, indent=4)
-            
-    # def load_from_file(self):
-    #     if os.path.exists(self.db_path):
-    #         try:
-    #             with open(self.db_path, 'r') as f:
-    #                 data = json.load(f)
-    #                 self.tasks = [Task.from_dict(item) for item in data]
-    #         except (json.JSONDecodeError, ValueError):
-    #             self.tasks = []

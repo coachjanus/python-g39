@@ -37,18 +37,3 @@ class DBHandler:
         except OSError as e:
             return DBResponse([], DB_READ_ERROR)  
 
-    # def create_task(self, task_data):
-    #     # Logic to insert a new task into the database
-    #     pass
-
-    # def get_task(self, task_id):
-    #     # Logic to retrieve a task by its ID from the database
-    #     pass
-
-    # def update_task(self, task_id, updated_data):
-    #     # Logic to update an existing task in the database
-    #     pass
-
-    # def delete_task(self, task_id):
-    #     # Logic to delete a task from the database
-    #     pass
