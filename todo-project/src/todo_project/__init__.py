@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import typer
+import logging
 
 from todo_project import config
 
@@ -11,6 +12,7 @@ from .database import init_database
 
 
 # from .cli import cli  # pyright: ignore[reportMissingImports]
+logging.basicConfig(filename="todo.log", level=logging.DEBUG)
 
 app = typer.Typer()
 
@@ -45,14 +47,18 @@ def start():
                 try:
                     task_id = int(input("Enter task ID to mark as completed: "))
                     ui.complete(task_id)
+                    logging.debug("Mark task as compeleted")
                 except ValueError:
                     print("Invalid ID. Please enter a number.")
+                    logging.debug("Invalid ID. Please enter a number.")
             case '4':
                 try:
                     task_id = int(input("Enter task ID to remove: "))
                     ui.remove(task_id)
+                    logging.debug("remove task by ID")
                 except ValueError:
                     print("Invalid ID. Please enter a number.")
+                    logging.debug("Invalid ID. Please enter a number.")
             case '5':
                 try:
                     task_id = int(input("Enter task ID to change priority: "))
