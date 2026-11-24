@@ -21,6 +21,7 @@ DIR_ERROR: "config directory error",
 FILE_ERROR: "config file error",
 DB_READ_ERROR: "database read error",
 DB_WRITE_ERROR: "database write error",
+JSON_ERROR: "JSON-file ERROR",
 ID_ERROR: "to-do id error",
 }
 

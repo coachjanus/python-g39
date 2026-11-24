@@ -1,38 +1,32 @@
-
+"""Represents a task in the todo application."""
+ 
+from dataclasses import dataclass, asdict
 from todo_project.priority import Priority
-
-
+# Використання @dataclass для моделі Task (model.py): 
+# Замість ручного написання __init__ та to_dict(), використайте стандартний @dataclass з dataclasses.asdict. 
+# Це зменшить кількість коду вдвічі і зробить його чистішим.
+@dataclass
 class Task:
-    """Represents a task in the todo application."""
-
-    def __init__(self, id: int, description: str = "", priority: Priority = Priority.NORMAL, completed: bool = False):
-        self.id = id
-        # self.title = title
-        self.description = description
-        self.completed = completed
-        self.priority = priority
+    id: int
+    description: str = ""
+    priority: Priority = Priority.NORMAL
+    completed: bool = False
 
     def mark_completed(self) -> None:
-        """Marks the task as completed."""
         self.completed = True
 
     def __str__(self) -> str:
         status = "✓" if self.completed else "✗"
         return f"[{status}] : {self.description}"
-    
+
     @classmethod
-    def from_dict(cls, data: dict):
+    def from_dict(cls, data: dict) -> "Task":
         return cls(
-        id=data["id"],
-        description=data["description"],
-        completed=data.get("completed", False),
-        priority=Priority(data.get("priority", 0)),
+            id=data["id"],
+            description=data["description"],
+            completed=data.get("completed", False),
+            priority=Priority(data.get("priority", 0)),
         )
-        
-    def to_dict(self):
-        return {
-        "id": self.id,
-        "description": self.description,
-        "completed": self.completed,
-        "priority": self.priority,
-        }
+
+    def to_dict(self) -> dict:
+        return asdict(self)

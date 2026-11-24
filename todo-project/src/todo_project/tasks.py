@@ -1,52 +1,54 @@
-from .model import Task
+
 from pathlib import Path
-from .dbhandler import DBHandler
 from typing import Dict, List
+from .model import Task
+from .priority import Priority
+from .dbhandler import DBHandler
 from .responses import TodoResponse
-from .config import SUCCESS
+from .config import SUCCESS, ID_ERROR
+
 
 class TaskList:
-    """A class representing a list of tasks."""
+    """Manages tasks in memory using a dictionary for O(1) lookups."""
 
-    def __init__(self, db_path:Path)->None:
+    def __init__(self, db_path: Path) -> None:
         self._db_handler = DBHandler(db_path)
         response = self._db_handler.load_from_file()
-        self._tasks: List[Task] = [task for task in response.data]
-        
-        self._next_id = 1 if not self._tasks else len(self._tasks) + 1
+        self._tasks: Dict[int, Task] = {task.id: task for task in response.data}
+        self._next_id = max(self._tasks.keys(), default=0) + 1
 
+    def _save(self) -> int:
+        return self._db_handler.save_to_file(list(self._tasks.values())).error
 
-    def add_task(self, description: str, priority: str = "normal") -> TodoResponse:
-        """Add a new task to the list."""
-        task_id = self._next_id
-        task = Task(task_id, description=description, priority=priority)
-
-        self._tasks.append(task)
+    def add_task(self, description: str, priority: Priority = Priority.NORMAL) -> TodoResponse:
+        task = Task(id=self._next_id, description=description, priority=priority)
+        self._tasks[task.id] = task
         self._next_id += 1
+        error = self._save()
+        return TodoResponse(task, error)
 
-        response = self._db_handler.save_to_file(self._tasks)
-        if response.error == SUCCESS:
-            return TodoResponse(task, response.error)
+    def remove_task(self, task_id: int) -> TodoResponse | None:
+        task = self._tasks.pop(task_id, None)
+        if not task:
+            return None
+        error = self._save()
+        return TodoResponse(task, error)
 
-    def remove_task(self, task: Task) -> None:
-        """Remove a task from the list."""
-        if task in self.tasks:
-            self.tasks.remove(task)
+    def get_tasks(self) -> List[Task]:
+        return list(self._tasks.values())
 
-    def get_tasks(self) -> list:
-        """Return the list of tasks."""
-        return self._tasks
-    
-    def mark_completed(self, task_id: int):
-        for task in self.tasks:
-            if task.id == task_id:
-                task.completed = True
-                return True
-        return False
+    def mark_completed(self, task_id: int) -> TodoResponse | None:
+        task = self._tasks.get(task_id)
+        if not task:
+            return None
+        task.mark_completed()
+        error = self._save()
+        return TodoResponse(task, error)
 
-    def set_priority(self, task_id: int, priority: int):
-        for task in self._tasks:
-            if task.id == task_id:
-                task.priority = priority
-                return True
-        return False
+    def set_priority(self, task_id: int, priority: Priority) -> TodoResponse | None:
+        task = self._tasks.get(task_id)
+        if not task:
+            return None
+        task.priority = priority
+        error = self._save()
+        return TodoResponse(task, error)
