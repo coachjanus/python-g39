@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My site - {% block title %}{% endblock title %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MKn5NWVBEuQXJE7TSKSgPUmMiSCmVTfCsR+VSSeQpHnoyJQZZFn/kBn+Ht5jZDPQ" crossorigin="anonymous">
+</head>
+
+<body>
+    <nav class="nav">
+  <a class="nav-link active" aria-current="page" href="/">Home</a>
+  <a class="nav-link" href="/about">About</a>
+  <a class="nav-link" href="/contact">Contact</a>
+  
+</nav>
+    <h1>My site</h1>
+    <section>
+        <header> {% block header %}{% endblock header %} </header>
+        <main>
+            {% block content %}<p>No items.</p>{% endblock content %}
+        </main>
+    </section>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-+PW0IDVGGwmpaBQvcXY+W0BcpHpITFB3dSfSoGvDdHtLbrLpSbpGcvtQRM/BJpz+" crossorigin="anonymous"></script>
+</body>
+
+</html>
+
+

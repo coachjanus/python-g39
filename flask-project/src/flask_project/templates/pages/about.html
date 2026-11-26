@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h2>{% block title %}About Page{% endblock title %}</h2>
+{% endblock header %}
+{% block content %}
+<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nemo porro quos quaerat eligendi nam sunt? Error beatae ut ad eveniet nam quo. Odit labore itaque quisquam magnam consequatur, laboriosam adipisci.</p>
+<p>
+Learn more about this project by visiting the <a href="{{ url_for('pages.contact') }}">Contact page</a>.
+</p>
+{% endblock content %}
